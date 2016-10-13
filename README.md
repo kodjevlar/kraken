@@ -6,6 +6,12 @@ GraphQL server boilerplate
 - docker-compose
 
 ## Development setup
-`npm install`
-
+`npm install`<br/>
 `docker-compose up`
+
+### Running tests
+Run tests once:
+`npm test` or `npm run test`<br/>
+
+Run and watch tests:
+`npm run test:watch`
