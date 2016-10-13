@@ -1,0 +1,30 @@
+{
+  "name": "kraken",
+  "version": "0.1.0",
+  "description": "GraphQL server",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "express-graphql": "^0.5.4",
+    "graphql": "^0.7.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha",
+    "start": "docker-compose up"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kodjevlar/kraken.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kodjevlar/kraken/issues"
+  },
+  "homepage": "https://github.com/kodjevlar/kraken#readme"
+}

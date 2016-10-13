@@ -1,0 +1,12 @@
+version: '2'
+services:
+  app:
+    build: .
+    environment:
+      PORT: 8000
+      ENDPOINT: '/graphql'
+      NODE_ENV: 'development'
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - 80:8000
