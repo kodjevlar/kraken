@@ -9,7 +9,7 @@ const customer = new gql.GraphQLObjectType({
       type: gql.GraphQLString,
       description: 'Firstname of the customer',
       resolve() {
-        return 'Test';
+        return 'Firstname';
       }
     },
     lastname: {
