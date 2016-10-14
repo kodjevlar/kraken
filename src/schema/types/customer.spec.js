@@ -8,6 +8,6 @@ const customer = require('./customer');
 describe('Customer schema', function() {
 
   it('Should export an object', function() {
-    expect(typeof customer).to.equal('Object');
+    expect(typeof customer).to.equal('object');
   });
 });

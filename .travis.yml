@@ -1,9 +1,9 @@
 language: node_js
 node_js:
- - "6"
+- '6'
 notifications:
   slack:
     rooms:
-      - nakd:KgC8lTFonCFaGhb6avUK50BK
+      secure: 3WJa4LNQIjvJmSXJom9TmbMVk7ZodkPSKECv/GrazhGlne3BURUAcgy04RxUgjnmNxnKXY4RenfoVdxzPGJROjOfUMDvK51fKJ3D3YDWqYE6WSVCQUVm/x4kDZwdgD+tmrII0QzDU14s8RWutZDk61RWzzs+6XIVtwgTeoDL87UCC84TsZVcwxK4JxxGpRxBn9SzB4wXadZWeVDnByfFom+8uHsHNmF/Kvajyf3BKcUQecJHstV25NydPOt86kMB4biC/ghyil3lx2dZB5aqjKd0WSg8Bjp1xkQ+CFpaSOLbo6HByBzVWg0rzvOwNZl0FfpHE1NU31O4T4MnCHV1KIA5LJ4wbDPYMIIdIT6W8/ZsQlIY3g29MahUwOGduQv2SirgaHy7/i6F6dIJwVvhcKApQPTVdZ9PAR7DxBPE8exlL+C7ND2WonZx2n24y4EWKjjy2zuUI7Tbin4sdKVdM7LwN+2teGm71e5HbKMXHW0huFWu5DCDYf9+12R2YwSxiMmb39mbBqw9pkGfQ4nnZ+8/FJfXkhGSBw3weJ+UOh4ROjWhMssLJcTf1kUNhBjay2ISXQmVRBSZvoFo9h5XVowW1dJI4nvQ4Soj2FeX0rFxSLHEiWAKmrYw8Zm9pTk5mQignhsDPh4BPTWxGOKkG8wco/j6LT61R8aw325x6RQ=
     on_success: change
     on_failure: always
