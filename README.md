@@ -1,6 +1,8 @@
 # kraken
 GraphQL server boilerplate
 
+![](https://api.travis-ci.org/kodjevlar/kraken.svg?branch=master)
+
 ## Requirements
 - docker
 - docker-compose
