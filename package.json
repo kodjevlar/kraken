@@ -11,11 +11,12 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "istanbul": "^0.4.5",
-    "mocha": "^3.1.2"
+    "mocha": "^3.1.2",
+    "nyc": "^8.3.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --recursive ./src/**/*.spec.js",
-    "test:watch": "./node_modules/.bin/mocha --watch --recursive ./src/**/*.spec.js",
+    "test": "./node_modules/.bin/nyc --show-process-tree ./node_modules/.bin/mocha './src/**/*.spec.js'",
+    "test:watch": "./node_modules/.bin/mocha --watch './src/**/*.spec.js'",
     "start": "docker-compose up"
   },
   "repository": {

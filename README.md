@@ -2,6 +2,8 @@
 GraphQL server boilerplate
 
 ![](https://api.travis-ci.org/kodjevlar/kraken.svg?branch=master)
+[![codecov](https://codecov.io/gh/kodjevlar/kraken/branch/master/graph/badge.svg)](https://codecov.io/gh/kodjevlar/kraken)
+
 
 ## Requirements
 - docker
