@@ -6,7 +6,8 @@
   "dependencies": {
     "express": "^4.14.0",
     "express-graphql": "^0.5.4",
-    "graphql": "^0.7.2"
+    "graphql": "^0.7.2",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

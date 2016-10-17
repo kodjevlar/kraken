@@ -9,7 +9,7 @@
   ],
   "rules": {
     "semi" : [2, "always"],
-    "max-len": [2, 120, 2],
+    "max-len": [2, 80, 2],
     "quotes": [2, "single", { "allowTemplateLiterals": true }],
     "object-curly-spacing": ["error", "always", {
       "objectsInObjects": false,

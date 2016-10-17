@@ -1,14 +1,17 @@
 'use strict';
 
+const logger = require('./lib/logging');
 const app = require('express')();
 const graphqlHTTP = require('express-graphql');
-const Schema = require('./schema');
+const RootSchema = require('./models/root');
+
+logger.info('Application started in ' + process.env.NODE_ENV + ' mode');
 
 app.use(process.env.ENDPOINT, graphqlHTTP({
-  schema: Schema,
+  schema: RootSchema,
   graphiql: process.env.NODE_ENV === 'development'
 }));
 
 app.listen(process.env.PORT, function() {
-  console.log(`Listening on port ${process.env.PORT}`);
+  logger.info(`Serving endpoint at ${process.env.ENDPOINT}`);
 });
