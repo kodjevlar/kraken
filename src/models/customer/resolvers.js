@@ -1,7 +1,6 @@
 /**
  * Defines resolvers for customer entity
  */
-const Resolver = require('../../lib/resolver/index');
 const Cache = require('../../lib/cache');
 const ENTITY_KEY = 'customer';
 

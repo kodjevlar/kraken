@@ -29,7 +29,57 @@ describe('Cache', function() {
     });
   });
 
+  describe('Setup', function() {
+    it('should set a cache engine instance', function() {
+      Cache.setup('obj');
+      expect(Cache.client).to.equal('obj');
+    });
+
+    after(function() {
+      Cache.client = null;
+    });
+  });
+
+  describe('Get', function() {
+    beforeEach(function() {
+      Cache.client = null;
+    });
+
+    it('should reject promise if cache engine throws', function(done) {
+      Cache.client = {
+        get: function(key, callback) {
+          return callback(new Error('Some error'));
+        }
+      };
+
+      Cache.get('somekey').catch(function(err) {
+        expect(err.message).to.equal('Some error');
+        done();
+      });
+    });
+
+    it('should resolve data if no errors', function(done) {
+      Cache.client = {
+        get: function(key, callback) {
+          return callback(null, '{"id":1}');
+        }
+      };
+
+      Cache.get('somekey').then(function(data) {
+        expect(typeof data.found).to.equal('boolean');
+        expect(typeof data.data).to.equal('object');
+        expect(data.data).to.deep.equal({ id: 1 });
+        expect(data.found).to.equal(true);
+        done();
+      });
+    });
+  });
+
   describe('Read trough', function() {
+    afterEach(function() {
+      Cache.client = null;
+    });
+
     it('should return a promise', function() {
       const actual = Cache.readthrough('customer', { id: 1 }, 3600, function() {
 
@@ -38,20 +88,22 @@ describe('Cache', function() {
       expect(actual instanceof Promise).to.equal(true);
     });
 
-    it('should fetch data from callback if no data in cache', function() {
+    it('should fetch data from callback if no data in cache', function(done) {
       const stub = sinon.stub(Cache, 'get');
       stub.returns(Promise.resolve({
         found: false,
-        data: ''
+        data: null
       }));
 
-      return Cache.readthrough('customer', { id: 1 }, 3600, function() {
+      Cache.client = {
+        setex: function(key, ttl, data, cb) {}
+      };
+
+      Cache.readthrough('customer', { id: 1 }, 3600, function() {
+        done();
+        stub.restore();
         return 'fresh data';
-      })
-        .then(function(data) {
-          expect(data).to.equal('fresh data');
-          stub.restore();
-        });
+      });
     });
 
     it('should not fetch data from callback if found in cache', function() {
@@ -71,52 +123,28 @@ describe('Cache', function() {
         });
     });
 
-    it('should send errors via the error event', function(done) {
+    it('should add data to cache engine', function(done) {
       const getStub = sinon.stub(Cache, 'get');
       getStub.returns(Promise.resolve({
         found: false,
         data: null
       }));
 
-      const addStub = sinon.stub(Cache, 'add');
-      addStub.returns(Promise.reject(new Error('some error')));
+      const fetchCallback = function() {
+        return { id: 1 };
+      };
 
-      Cache.on('error', function(err) {
-        expect(err.message).to.equal('some error');
-        done();
-      });
-
-      Cache.readthrough('customer', { id: 1 }, 3600, function() {
-        return null;
-      })
-        .then(function(data) {
-          expect(data).to.equal(null);
+      Cache.client = {
+        setex: function(key, ttl, data, cb) {
+          expect(key).to.equal('entity_customer_id_1_');
+          expect(ttl).to.equal(3600);
+          expect(data).to.equal('{"id":1}');
           getStub.restore();
-          addStub.restore();
-        });
-    });
+          done();
+        }
+      };
 
-    it('should add data to cache engine', function() {
-      const getStub = sinon.stub(Cache, 'get');
-      getStub.returns(Promise.resolve({
-        found: false,
-        data: null
-      }));
-
-      const addMock = sinon.mock(Cache);
-      const expectation = addMock
-        .expects('add')
-        .withArgs('entity_customer_id_1_', 'data', 3600)
-        .returns(Promise.resolve());
-
-      return Cache.readthrough('customer', { id: 1 }, 3600, function() {
-        return 'data';
-      })
-        .then(function(data) {
-          console.log('asdasdasd');
-          expectation.verify();
-          getStub.restore();
-        });
+      Cache.readthrough('customer', { id: 1 }, 3600, fetchCallback);
     });
   });
 });
