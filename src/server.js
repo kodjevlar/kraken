@@ -3,7 +3,7 @@
 const logger = require('./lib/logging');
 const app = require('express')();
 const graphqlHTTP = require('express-graphql');
-const RootSchema = require('./models/root');
+const RootSchema = require('./schemas/root/schema');
 const Redis = require('redis');
 const Cache = require('./lib/cache');
 

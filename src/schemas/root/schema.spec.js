@@ -1,8 +1,8 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const schema = require('./root');
+const schema = require('./schema');
 
 describe('Schema', function() {
-
+  
 });
