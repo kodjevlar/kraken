@@ -3,9 +3,9 @@
 const logger = require('./lib/logging');
 const app = require('express')();
 const graphqlHTTP = require('express-graphql');
-const RootSchema = require('./schemas/root/schema');
+const RootSchema = require('./schema/schema');
 const Redis = require('redis');
-const Cache = require('./lib/cache');
+const Cache = require('readthrough');
 
 logger.info('Application started in ' + process.env.NODE_ENV + ' mode');
 
