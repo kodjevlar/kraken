@@ -8,5 +8,5 @@ if [ "$NODE_ENV" = "production" ]; then
   node --harmony_async_await src/server.js
 elif [ "$NODE_ENV" = "development" ]; then
   echo "Running in development mode..."
-  nodemon --inspect=9222 --debug-brk --harmony_async_await src/server.js
+  nodemon --inspect=9222 --harmony_async_await src/server.js
 fi

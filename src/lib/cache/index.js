@@ -1,104 +1,100 @@
 'use strict';
 
 /**
- * Read through cache implementation with Redis
- *
- * Features:
- *  - Read through cache
+ * Contains the readthrough configuration
+ * @type {Object}
  */
+const settings = {};
 
-const self = module.exports = {
-  /**
-   * Redis client
-   * @type {RedisClient}
-   */
-  client: null,
+/**
+ * Read through cache implementation
+ * @param {Object} config Config object
+ */
+function setup(config) {
+  if (typeof config.write !== 'function') {
+    throw new TypeError('write property must be a function');
+  }
 
-  /**
-   * Sets the redis cache engine
-   * @param  {RedisClient} client Redis client
-   * @return {void}
-   */
-  setup: function(client) {
-    self.client = client;
-  },
+  if (typeof config.read !== 'function') {
+    throw new TypeError('read property must be a function');
+  }
 
-  /**
-   * Constructs a cache key for data
-   * @param  {string} entity     Name of the entity
-   * @param  {Object} identifier Object that identifies the data
-   * @return {string}            Constructed cache key
-   */
-  constructCacheKey: function(entity, identifier) {
-    // Sort the keys if there are more than 1, to eliminiate duplicate keys
-    if (Object.keys(identifier).length > 1) {
-      const sortedKeys = Object.keys(identifier).sort();
-      const sortedIdentifier = {};
+  settings.read = config.read;
+  settings.write = config.write;
+  settings.enabled = 'enabled' in config ? config.enabled : true;
+}
 
-      for (const key of sortedKeys) {
-        sortedIdentifier[key] = identifier[key];
-      }
+/**
+ * Constructs a cache key for data
+ * @param  {string} entity     Name of the entity
+ * @param  {Object} identifier Object that identifies the data
+ * @return {string}            Constructed cache key
+ */
+function constructCacheKey(entity, identifier) {
+  // Sort the keys if there are more than 1, to eliminiate duplicate keys
+  if (Object.keys(identifier).length > 1) {
+    const sortedKeys = Object.keys(identifier).sort();
+    const sortedIdentifier = {};
 
-      identifier = sortedIdentifier;
+    for (const key of sortedKeys) {
+      sortedIdentifier[key] = identifier[key];
     }
 
-    // Create a key from JSON
-    return 'entity_' + entity + JSON.stringify(identifier)
-      .replace(/[\W_]+/g, '_');
-  },
+    identifier = sortedIdentifier;
+  }
 
-  /**
-   * Fetches data from cache
-   * @todo This can be made in faster way. Promises are pretty slow atm.
-   * @param  {string} key Cache key to load from
-   * @return {Promise}    Data object
-   */
-  get: function(key) {
-    return new Promise(function(resolve, reject) {
-      self.client.get(key, function(err, data) {
-        if (err) {
-          return reject(err);
-        }
+  // Create a key from JSON
+  return 'entity_' + entity + JSON.stringify(identifier)
+    .replace(/[\W_]+/g, '_');
+}
 
-        return resolve({
-          found: !(data === null),
-          data: JSON.parse(data)
-        });
-      });
-    });
-  },
+/**
+ * Wraps the user specified callback in a promise
+ * @param {Function} callback Callback function
+ * @return {Promise}          Wrapped promise if needed
+ */
+function getUserDataSource(callback) {
+  let result = callback();
 
-  /**
-   * Read through helper function
-   * @param  {string}   entity     Name of the entity to get
-   * @param  {object}   identifier Object that identifies the data
-   * @param  {int}      ttl        Time-to-live for the object (seconds)
-   * @param  {Function} callback   Callback that collects data if it doesnt
-   *                               exists
-   *                               in cache. Should return a Promise
-   * @return {Promise}             Resolves the gathered data
-   */
-  readthrough: function(entity, identifier, ttl, callback) {
-    const key = self.constructCacheKey(entity, identifier);
+  if (!(result instanceof Promise)) {
+    result = Promise.resolve(result);
+  }
 
-    return self.get(key).then(function(data) {
-      // Early return if the data existed in cache
-      if (data.found) {
-        return data.data;
-      }
+  return result;
+}
 
-      // Run the callback to get the data
-      let result = callback();
+/**
+ * Readthrough
+ * @param {String}   entity     Name of the entity to cache (for generating key)
+ * @param {Object}   identifier Object to identify the entry
+ * @param {integer}  ttl        Time to live for the entry
+ * @param {Function} callback   Function to run when the data wasnt found
+ * @return {Promise}            Promise with resolved data
+ */
+function readthrough(entity, identifier, ttl, callback) {
+  if (!settings.enabled) {
+    return getUserDataSource(callback);
+  }
 
-      // Wrap scalar values in promise
-      if (!(result instanceof Promise)) {
-        result = Promise.resolve(result);
-      }
+  const key = constructCacheKey(entity, identifier);
+  // Try to get the data from cache
+  return settings.read(key).then(function(data) {
+    if (!(data === undefined)) {
+      return JSON.parse(data);
+    }
 
-      return result.then(function(data) {
-        self.client.setex(key, ttl, JSON.stringify(data));
+    return getUserDataSource(callback).then(function resolveResult(data) {
+      return settings.write(key, JSON.stringify(data), ttl).then(function() {
         return data;
       });
     });
-  }
+  });
+}
+
+module.exports = {
+  setup: setup,
+  readthrough: readthrough,
+  _constructCacheKey: constructCacheKey,
+  _getUserDataSource: getUserDataSource,
+  _settings: settings
 };

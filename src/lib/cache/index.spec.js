@@ -5,21 +5,56 @@ const expect = chai.expect;
 const Cache = require('./index');
 
 describe('Cache', function() {
+  describe('Setup', function() {
+    it('should throw error if read setting is not a function', function() {
+      expect(function() {
+        Cache.setup({
+          write: function() { }
+        });
+      }).to.throw(TypeError);
+    });
+
+    it('should throw error if write setting is not a function', function() {
+      expect(function() {
+        Cache.setup({
+          read: function() { }
+        });
+      }).to.throw(TypeError);
+    });
+
+    it('should set the enabled flag', function() {
+      Cache.setup({
+        read: function() {},
+        write: function() {},
+        enabled: false
+      });
+
+      expect(Cache._settings.enabled).to.be.false;
+    });
+  });
+
   describe('Construct cache key', function() {
+    beforeEach(function() {
+      Cache.setup({
+        write: function() {},
+        read: function() {}
+      });
+    });
+
     it('should generate a string', function() {
       const expected = 'entity_customer_id_1_';
-      const actual = Cache.constructCacheKey('customer', { id: 1 });
+      const actual = Cache._constructCacheKey('customer', { id: 1 });
       expect(actual).to.equal(expected);
     });
 
     it('should create the same key for different order of identifier keys', function() {
       const expected = 'entity_customer_id_1_name_test_';
-      const actual1 = Cache.constructCacheKey('customer', {
+      const actual1 = Cache._constructCacheKey('customer', {
         id: 1,
         name: 'test'
       });
 
-      const actual2 = Cache.constructCacheKey('customer', {
+      const actual2 = Cache._constructCacheKey('customer', {
         name: 'test',
         id: 1
       });
@@ -29,58 +64,15 @@ describe('Cache', function() {
     });
   });
 
-  describe('Setup', function() {
-    it('should set a cache engine instance', function() {
-      Cache.setup('obj');
-      expect(Cache.client).to.equal('obj');
-    });
-
-    after(function() {
-      Cache.client = null;
-    });
-  });
-
-  describe('Get', function() {
-    beforeEach(function() {
-      Cache.client = null;
-    });
-
-    it('should reject promise if cache engine throws', function(done) {
-      Cache.client = {
-        get: function(key, callback) {
-          return callback(new Error('Some error'));
-        }
-      };
-
-      Cache.get('somekey').catch(function(err) {
-        expect(err.message).to.equal('Some error');
-        done();
-      });
-    });
-
-    it('should resolve data if no errors', function(done) {
-      Cache.client = {
-        get: function(key, callback) {
-          return callback(null, '{"id":1}');
-        }
-      };
-
-      Cache.get('somekey').then(function(data) {
-        expect(typeof data.found).to.equal('boolean');
-        expect(typeof data.data).to.equal('object');
-        expect(data.data).to.deep.equal({ id: 1 });
-        expect(data.found).to.equal(true);
-        done();
-      });
-    });
-  });
-
   describe('Read trough', function() {
-    afterEach(function() {
-      Cache.client = null;
-    });
-
     it('should return a promise', function() {
+      Cache.setup({
+        read: function(key) {
+          return Promise.resolve('asd');
+        },
+        write: function() { }
+      });
+
       const actual = Cache.readthrough('customer', { id: 1 }, 3600, function() {
 
       });
@@ -89,62 +81,70 @@ describe('Cache', function() {
     });
 
     it('should fetch data from callback if no data in cache', function(done) {
-      const stub = sinon.stub(Cache, 'get');
-      stub.returns(Promise.resolve({
-        found: false,
-        data: null
-      }));
-
-      Cache.client = {
-        setex: function(key, ttl, data, cb) {}
-      };
+      Cache.setup({
+        read: function() {
+          return Promise.resolve(undefined);
+        },
+        write: function() {
+          return Promise.resolve();
+        }
+      });
 
       Cache.readthrough('customer', { id: 1 }, 3600, function() {
+        return 'Some data';
+      }).then(function(data) {
+        expect(data).to.equal('Some data');
         done();
-        stub.restore();
-        return 'fresh data';
       });
     });
 
     it('should not fetch data from callback if found in cache', function() {
-      const stub = sinon.stub(Cache, 'get');
-      stub.returns(Promise.resolve({
-        found: true,
-        data: 'cached data'
-      }));
+      Cache.setup({
+        read: function() {
+          return Promise.resolve(JSON.stringify('data'));
+        },
+        write: function() {}
+      });
 
       const spy = sinon.spy();
 
-      return Cache.readthrough('customer', { id: 1 }, 3600, spy)
-        .then(function(data) {
-          expect(spy.callCount).to.equal(0);
-          expect(data).to.equal('cached data');
-          stub.restore();
-        });
+      return Cache.readthrough('customer', { id: 1 }, 3600, spy).then(function(data) {
+        expect(data).to.equal('data');
+        expect(spy.callCount).to.equal(0);
+      });
     });
 
-    it('should add data to cache engine', function(done) {
-      const getStub = sinon.stub(Cache, 'get');
-      getStub.returns(Promise.resolve({
-        found: false,
-        data: null
-      }));
-
-      const fetchCallback = function() {
-        return { id: 1 };
-      };
-
-      Cache.client = {
-        setex: function(key, ttl, data, cb) {
+    it('should call the write callback when data has been resolved', function(done) {
+      Cache.setup({
+        read: function() {
+          return Promise.resolve();
+        },
+        write: function(key, data, ttl) {
           expect(key).to.equal('entity_customer_id_1_');
+          expect(data).to.equal(JSON.stringify('some data'));
           expect(ttl).to.equal(3600);
-          expect(data).to.equal('{"id":1}');
-          getStub.restore();
           done();
         }
-      };
+      });
 
-      Cache.readthrough('customer', { id: 1 }, 3600, fetchCallback);
+      Cache.readthrough('customer', { id: 1 }, 3600, function() {
+        return 'some data';
+      });
+    });
+
+    it('should not read from cache when cache is disabled', function(done) {
+      const spy = sinon.spy();
+
+      Cache.setup({
+        read: spy,
+        write: spy,
+        enabled: false
+      });
+
+      Cache.readthrough('customer', { id: 1 }, 3600, function() {
+        expect(spy.callCount).to.equal(0);
+        done();
+      });
     });
   });
 });
