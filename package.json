@@ -7,6 +7,7 @@
     "express": "^4.14.0",
     "express-graphql": "^0.5.4",
     "graphql": "^0.7.2",
+    "readthrough": "^0.1.1",
     "redis": "^2.6.2",
     "winston": "^2.2.0",
     "winston-graylog2": "^0.5.1"
@@ -21,7 +22,8 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "nyc": "^8.3.1",
-    "sinon": "^1.17.6"
+    "sinon": "^1.17.6",
+    "yeoman-generator": "^0.24.1"
   },
   "scripts": {
     "test": "./node_modules/.bin/nyc --show-process-tree ./node_modules/.bin/mocha './src/**/*.spec.js'",
