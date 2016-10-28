@@ -54,7 +54,7 @@ function hrtimeToMs(hrResult) {
  */
 function Check(action, infoThreshold, warnThreshold) {
   if (infoThreshold > warnThreshold) {
-    throw new TypeError('Warning threshold cannot be higher than error');
+    throw new TypeError('Info threshold cannot be higher than warning');
   }
 
   this.action = action;
