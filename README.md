@@ -1,8 +1,8 @@
 # kraken
 GraphQL server boilerplate
 
-![](https://api.travis-ci.org/kodjevlar/kraken.svg?branch=master)
-[![codecov](https://codecov.io/gh/kodjevlar/kraken/branch/master/graph/badge.svg)](https://codecov.io/gh/kodjevlar/kraken)
+![](https://api.travis-ci.org/kodjevlar/kraken.svg?branch=development)
+[![codecov](https://codecov.io/gh/kodjevlar/kraken/branch/development/graph/badge.svg)](https://codecov.io/gh/kodjevlar/kraken)
 
 
 ## Requirements
