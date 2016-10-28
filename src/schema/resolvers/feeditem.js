@@ -21,7 +21,11 @@ function getItems(parent, args) {
       type: 'post',
       name: 'Some post',
       createdAt: '2017',
-      updatedAt: '2017'
+      updatedAt: '2017',
+      postproduct: {
+        name: 'Some post product name',
+        price: 299
+      }
     },
     {
       type: 'post',

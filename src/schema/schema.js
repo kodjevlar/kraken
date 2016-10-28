@@ -6,9 +6,8 @@ const gql = require('graphql');
  */
 
 // Types
-const PostFeeditem = require('./types/postfeeditem');
-const ProductFeeditem = require('./types/productfeeditem');
-const SimpleProduct = require('./types/simpleproduct');
+const FeeditemPost = require('./types/feeditem/post');
+const FeeditemProduct = require('./types/feeditem/product');
 
 // Unions
 const FeeditemType = require('./unions/feeditem');
@@ -16,7 +15,13 @@ const FeeditemType = require('./unions/feeditem');
 // Resolvers
 const FeeditemResolvers = require('./resolvers/feeditem');
 
+// Interfaces
+const DisplayProductInterface = require('./interfaces/displayproduct');
+
 const schema = new gql.GraphQLSchema({
+  types: (function() {
+    return [DisplayProductInterface];
+  })(),
   query: new gql.GraphQLObjectType({
     name: 'RootQueryType',
     fields: {

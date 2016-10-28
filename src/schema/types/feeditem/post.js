@@ -1,10 +1,8 @@
 'use strict';
 const gql = require('graphql');
 
-const SimpleProduct = require('../types/simpleproduct');
-
-const ProductFeedItem = new gql.GraphQLObjectType({
-  name: 'ProductFeeditem',
+const FeeditemPost = new gql.GraphQLObjectType({
+  name: 'FeeditemPost',
   fields: {
     createdAt: {
       type: gql.GraphQLString
@@ -14,11 +12,8 @@ const ProductFeedItem = new gql.GraphQLObjectType({
     },
     name: {
       type: gql.GraphQLString
-    },
-    product: {
-      type: SimpleProduct
     }
   }
 });
 
-module.exports = ProductFeedItem;
+module.exports = FeeditemPost;

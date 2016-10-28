@@ -1,22 +1,22 @@
 'use strict';
 const gql = require('graphql');
 
-const ProductFeeditem = require('../types/productfeeditem');
-const PostFeeditem = require('../types/postfeeditem');
+const FeedItemProduct = require('../types/feeditem/product');
+const FeeditemPost = require('../types/feeditem/post');
 
 const FeeditemType = new gql.GraphQLUnionType({
   name: 'Feeditem',
   types: [
-    ProductFeeditem,
-    PostFeeditem
+    FeedItemProduct,
+    FeeditemPost
   ],
   resolveType(feeditem) {
     if (feeditem.type === 'product') {
-      return ProductFeeditem;
+      return FeedItemProduct;
     }
 
     if (feeditem.type === 'post') {
-      return PostFeeditem;
+      return FeeditemPost;
     }
   }
 });
