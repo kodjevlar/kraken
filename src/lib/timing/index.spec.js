@@ -1,5 +1,6 @@
 const chai = require('chai');
 const expect = chai.expect;
+const sinon = require('sinon');
 
 const Timing = require('./index');
 
@@ -15,6 +16,12 @@ describe('Profiling', function() {
       const somelevel = 99;
       Timing.report(function() {}, somelevel);
       expect(Timing._settings.currentLevel).to.equal(somelevel);
+    });
+
+    it('should throw if callback isnt a function', function() {
+      expect(function() {
+        Timing.report('not a function', 5);
+      }).to.throw(TypeError);
     });
   });
 
@@ -56,6 +63,15 @@ describe('Profiling', function() {
 
       const check = new Timing.Check('some check', 0, 1000);
       check.stop();
+    });
+
+    it('should not emit report if below threshold', function() {
+      const spy = sinon.spy();
+      Timing.report(spy);
+      const check = new Timing.Check('some check', 1000, 1000);
+      check.stop();
+
+      expect(spy.callCount).to.equal(0);
     });
 
     it('should emit warning if above threshold', function(done) {
