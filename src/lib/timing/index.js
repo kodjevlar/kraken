@@ -84,7 +84,8 @@ Check.prototype.stop = function() {
     return;
   }
 
-  let reportLevel = diff < this.warnThreshold ? levels.info : levels.warn;
+  const reportLevel = diff < this.warnThreshold ? levels.info : levels.warn;
+
   return settings.reportHandler(reportLevel, this.action, diff, assertions);
 };
 

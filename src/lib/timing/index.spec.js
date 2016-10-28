@@ -8,12 +8,14 @@ describe('Profiling', function() {
   describe('Report', function() {
     it('should set callback function', function() {
       const someCallback = function() {};
+      
       Timing.report(someCallback);
       expect(Timing._settings.reportHandler).to.equal(someCallback);
     });
 
     it('should set report level', function() {
       const somelevel = 99;
+
       Timing.report(function() {}, somelevel);
       expect(Timing._settings.currentLevel).to.equal(somelevel);
     });
@@ -31,6 +33,7 @@ describe('Profiling', function() {
 
       setTimeout(function() {
         const actual = Timing._hrtimeToMs(process.hrtime(start));
+
         // Depending on the speed of the test environment
         expect(actual).to.be.above(5);
         expect(actual).to.be.below(15);
@@ -62,15 +65,18 @@ describe('Profiling', function() {
       });
 
       const check = new Timing.Check('some check', 0, 1000);
+
       check.stop();
     });
 
     it('should not emit report if below threshold', function() {
       const spy = sinon.spy();
-      Timing.report(spy);
-      const check = new Timing.Check('some check', 1000, 1000);
-      check.stop();
 
+      Timing.report(spy);
+
+      const check = new Timing.Check('some check', 1000, 1000);
+
+      check.stop();
       expect(spy.callCount).to.equal(0);
     });
 
