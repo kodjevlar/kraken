@@ -6,8 +6,23 @@ const graphqlHTTP = require('express-graphql');
 const RootSchema = require('./schema/schema');
 const Redis = require('redis');
 const Cache = require('readthrough');
+const Timing = require('./lib/timing');
 
 logger.info('Application started in ' + process.env.NODE_ENV + ' mode');
+
+// Setup timing
+Timing.report(function handleTimingReport(level, name, actual, assertions) {
+  const message = `Profiler: Action '${name}' took ${actual}ms to complete. ` +
+    `Expected to be below ${assertions.info}ms`;
+
+  if (level === Timing.levels.info) {
+    return logger.info(message, assertions);
+  }
+
+  return logger.warn(message, assertions);
+});
+
+const bootstrapTimer = new Timing.Check('Application bootstrap', 20, 100);
 
 const redisClient = Redis.createClient({
   host: 'cache',
@@ -56,5 +71,6 @@ app.use(process.env.ENDPOINT, graphqlHTTP({
 }));
 
 app.listen(process.env.PORT, function() {
+  bootstrapTimer.stop();
   logger.info(`Serving endpoint at ${process.env.ENDPOINT}`);
 });
