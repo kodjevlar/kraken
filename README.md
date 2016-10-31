@@ -66,13 +66,14 @@ Group the types inside a directory if it makes sense. The new type should in
 that case be prefixed with the group name. For example, the `variant.js` in
 `product` should be named `ProductVariant`.
 
-Boilerplate for a new type, in this case `ProductVariant`:
+Boilerplate for a new type, in this case `ProductVariant` with both input type
+and output type.
 ```js
 'use strict';
 const gql = require('graphql');
 
-const ProductVariant = new gql.GraphQLObjectType({
-  name: 'ProductVariant',
+const ProductVariantOutputType = new gql.GraphQLObjectType({
+  name: 'ProductVariantOutputType',
   fields: {
     name: {
       type: gql.GraphQLString
@@ -83,7 +84,22 @@ const ProductVariant = new gql.GraphQLObjectType({
   }
 });
 
-module.exports = ProductVariant;
+const ProductVariantInputType = new gql.GraphQLInputObjectType({
+  name: 'ProductVariantInputType',
+  fields: {
+    name: {
+      type: gql.GraphQLString
+    },
+    price: {
+      type: gql.GraphQLFloat
+    }
+  }
+});
+
+module.exports = {
+  output: ProductVariantOutputType,
+  input: ProductVariantInputType
+};
 ```
 
 #### Testing
