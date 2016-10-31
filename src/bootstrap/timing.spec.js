@@ -1,4 +1,6 @@
+const chai = require('chai');
 const sinon = require('sinon');
+const expect = chai.expect;
 
 const timing = require('../lib/timing');
 const logger = require('../lib/logging');
