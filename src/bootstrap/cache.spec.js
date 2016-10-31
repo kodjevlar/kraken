@@ -9,6 +9,7 @@ const cache = require('./cache');
 describe('Cache bootstrap', function() {
   it('should emit Redis errors to logger', function() {
     const logMock = sinon.mock(logger);
+
     logMock.expects('error').once();
     cache._handleRedisError(new Error('some error'));
     logMock.verify();
@@ -16,6 +17,7 @@ describe('Cache bootstrap', function() {
 
   it('should log if cache is disabled', function() {
     const logMock = sinon.mock(logger);
+
     logMock.expects('warn').once();
     cache._notifyCacheDisabled();
     logMock.verify();
@@ -23,6 +25,7 @@ describe('Cache bootstrap', function() {
 
   it('should not log if cache is enabled', function() {
     const logMock = sinon.mock(logger);
+
     process.env.CACHE_ENABLED = '1';
     logMock.expects('warn').never();
     cache._notifyCacheDisabled();
@@ -33,11 +36,13 @@ describe('Cache bootstrap', function() {
   describe('readthroughRead', function() {
     it('should return a promise', function() {
       const result = cache._readthroughRead(true);
+
       expect(result instanceof Promise).to.be.true;
     });
 
     it('should reject promise on read error', function(done) {
       const redisClientStub = sinon.stub(cache._redisClient, 'get');
+
       redisClientStub.yields(new Error('some error'), null);
 
       cache._readthroughRead('').catch(function(err) {
@@ -49,6 +54,7 @@ describe('Cache bootstrap', function() {
 
     it('should resolve undefined if cache answered with null', function() {
       const redisClientStub = sinon.stub(cache._redisClient, 'get');
+
       redisClientStub.yields(null, null);
 
       return cache._readthroughRead('').then(function(data) {
@@ -60,6 +66,7 @@ describe('Cache bootstrap', function() {
     it('should resolve data if cache answered with data', function() {
       const mockData = { some: 'data' };
       const redisClientStub = sinon.stub(cache._redisClient, 'get');
+
       redisClientStub.yields(null, mockData);
 
       return cache._readthroughRead('').then(function(data) {
@@ -72,11 +79,13 @@ describe('Cache bootstrap', function() {
   describe('readthroughWrite', function() {
     it('should return a promise', function() {
       const result = cache._readthroughWrite('key', 'data', 100);
+
       expect(result instanceof Promise).to.be.true;
     });
 
     it('should reject promise if write failed', function(done) {
       const redisClientStub = sinon.stub(cache._redisClient, 'setex');
+
       redisClientStub.yields(new Error('some error'), null);
 
       cache._readthroughWrite('key', 'data', 100).catch(function(err) {
