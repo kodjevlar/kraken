@@ -81,7 +81,7 @@ Check.prototype.stop = function() {
   }
 
   if (diff < this.infoThreshold) {
-    return;
+    return diff;
   }
 
   const reportLevel = diff < this.warnThreshold ? levels.info : levels.warn;
@@ -94,5 +94,5 @@ module.exports = {
   levels: levels,
   Check: Check,
   _settings: settings,
-  _hrtimeToMs: hrtimeToMs
+  hrtimeToMs: hrtimeToMs
 };

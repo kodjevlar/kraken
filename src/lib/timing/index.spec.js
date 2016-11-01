@@ -32,7 +32,7 @@ describe('Profiling', function() {
       const start = process.hrtime();
 
       setTimeout(function() {
-        const actual = Timing._hrtimeToMs(process.hrtime(start));
+        const actual = Timing.hrtimeToMs(process.hrtime(start));
 
         // Depending on the speed of the test environment
         expect(actual).to.be.above(5);
