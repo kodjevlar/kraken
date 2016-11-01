@@ -77,10 +77,17 @@ describe('Cache bootstrap', function() {
   });
 
   describe('readthroughWrite', function() {
-    it('should return a promise', function() {
+    it('should return a promise with result', function() {
+      const redisClientStub = sinon.stub(cache._redisClient, 'setex');
+
+      redisClientStub.yields(null, 'data');
       const result = cache._readthroughWrite('key', 'data', 100);
 
-      expect(result instanceof Promise).to.be.true;
+      return result.then(function(data) {
+        expect(data).to.equal('data');
+        expect(result instanceof Promise).to.be.true;
+        redisClientStub.restore();
+      });
     });
 
     it('should reject promise if write failed', function(done) {
