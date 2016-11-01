@@ -1,0 +1,6 @@
+.git
+node_modules
+*.spec.js
+coverage
+.vscode
+.nyc_output
