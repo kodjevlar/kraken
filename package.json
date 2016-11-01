@@ -27,8 +27,7 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/nyc --show-process-tree ./node_modules/.bin/mocha './src/**/*.spec.js'",
-    "test:watch": "./node_modules/.bin/mocha --watch './src/**/*.spec.js'",
-    "start": "docker-compose up"
+    "test:watch": "./node_modules/.bin/mocha --watch './src/**/*.spec.js'"
   },
   "repository": {
     "type": "git",

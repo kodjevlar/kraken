@@ -7,7 +7,7 @@ services:
       PORT: 8000
       ENDPOINT: '/graphql'
       NODE_ENV: 'development'
-      LOG_DIR: '/var/log/kraken'
+      LOG_DIR: '/var/log'
       PROJECT_NAME: 'kraken'
       CACHE_ENABLED: 1
     volumes:
@@ -18,5 +18,4 @@ services:
     depends_on:
       - cache
   cache:
-    container_name: cache
     image: redis
