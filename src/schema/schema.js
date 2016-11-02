@@ -1,38 +1,37 @@
 'use strict';
 const gql = require('graphql');
 
-/**
- * https://medium.com/the-graphqlhub/graphql-tour-interfaces-and-unions-7dd5be35de0d#.s507kj1ay
- */
-
 // Types
-const FeeditemPost = require('./types/feeditem/post');
-const FeeditemProduct = require('./types/feeditem/product');
-
-// Unions
-const FeeditemType = require('./unions/feeditem');
+const postType = require('./types/post/post');
 
 // Resolvers
-const FeeditemResolvers = require('./resolvers/feeditem');
+const postResolvers = require('./resolvers/post');
 
-// Interfaces
-const DisplayProductInterface = require('./interfaces/displayproduct');
+// Mutations
+const postMutations = require('./mutations/post');
 
 const schema = new gql.GraphQLSchema({
-  types: (function() {
-    return [DisplayProductInterface];
-  })(),
   query: new gql.GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-      feeditems: {
-        type: new gql.GraphQLList(FeeditemType),
-        resolve: FeeditemResolvers.getItems,
+      posts: {
+        type: new gql.GraphQLList(postType.output),
+        resolve: postResolvers.getPosts,
         args: {
           createdAt: {
             type: gql.GraphQLString
           }
         }
+      }
+    }
+  }),
+  mutation: new gql.GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+      createPost: {
+        type: postType.output,
+        args: postType.input._typeConfig.fields,
+        resolve: postMutations.createPost
       }
     }
   })
