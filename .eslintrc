@@ -15,5 +15,8 @@
       "objectsInObjects": false,
       "arraysInObjects": false
     }],
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017
   }
 }
