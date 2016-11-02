@@ -12,4 +12,6 @@ async function responseTime(ctx, next) {
   ctx.state.responseTime = timing.hrtimeToMs(process.hrtime(start));
 }
 
-module.exports = responseTime;
+module.exports = {
+  mw: responseTime
+};

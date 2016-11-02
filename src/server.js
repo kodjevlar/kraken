@@ -22,8 +22,8 @@ const router = new Router();
 
 // Apply middleware
 app.use(koaBody());
-app.use(accessLogger);
-app.use(responseTime);
+app.use(accessLogger.mw);
+app.use(responseTime.mw);
 
 // Mount graphql endpoint
 router.post('/graphql', graphql.graphqlKoa({
